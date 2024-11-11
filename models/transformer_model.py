@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import math
-
+import torch.functional as F
 
 
 class InputEmbedding(nn.Module):
@@ -93,10 +93,12 @@ class MultiHeadAttention(nn.Module):
     # (batch, h, seq_len, d_k) --> (batch, h, seq_len, seq_len)
     attention_scores = (query @ key.transpose(-2, -1)) / math.sqrt(d_k)
     if mask is not None:
-        # Write a very low value (indicating -inf) to the positions where mask == 0
-        attention_scores.masked_fill_(mask == 0, -1e9)
+      # Write a very low value (indicating -inf) to the positions where mask == 0
+      mask = mask.expand_as(attention_scores)
+      attention_scores = attention_scores.masked_fill(mask == 0, -1e9)
+      # attention_scores.masked_fill_(mask == 0, -1e9)
         
-    attention_scores = attention_scores.softmax(dim=-1) # (batch, h, seq_len, seq_len) # Apply softmax
+    attention_scores = F.softmax(attention_scores, dim=-1) # (batch, h, seq_len, seq_len) # Apply softmax
     if dropout is not None:
         attention_scores = dropout(attention_scores)
     # (batch, h, seq_len, seq_len) --> (batch, h, seq_len, d_k)
