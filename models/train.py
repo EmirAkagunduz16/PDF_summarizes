@@ -155,7 +155,8 @@ def get_model(config, vocab_src_len, vocab_tgt_len):
 
 def train_model(config):
   # define the device
-  device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+  # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+  device = torch.device('cpu')
   print('using device ', device)
 
   Path(f"{config['datasource']}_{config['model_folder']}").mkdir(parents=True, exist_ok=True)
