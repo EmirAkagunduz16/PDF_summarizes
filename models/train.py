@@ -209,6 +209,8 @@ def train_model(config):
       # Compare the output with the label
       label = batch['label'].to(device) # (B, seq_len)
 
+      optimizer.zero_grad(set_to_none=True)
+
       # Compute the loss using a simple cross entropy
       loss = loss_fn(proj_output.view(-1, tokenizer_tgt.get_vocab_size()), label.view(-1))
       batch_iterator.set_postfix({"loss": f"{loss.item():6.3f}"})
@@ -222,7 +224,6 @@ def train_model(config):
 
       # Update the weights
       optimizer.step()
-      optimizer.zero_grad(set_to_none=True)
 
       global_step += 1
 
